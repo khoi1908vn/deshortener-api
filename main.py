@@ -81,6 +81,7 @@ async def image(authorization: str = Header(None), url: str = Header(None)):
             return Response(f'Invalid token, given {authorization}', status_code=401)
         if not url:
             return Response('Missing URL in header', status_code=400)
+        print("Working on URL:", url)
         browser = browser_pool.get_browser()
         loop = asyncio.get_running_loop()
         redirect_list, elapsed = await loop.run_in_executor(None, de_shorten_url, browser, url)
