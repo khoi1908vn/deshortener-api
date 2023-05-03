@@ -1,4 +1,4 @@
-import os, time, requests, asyncio
+import os, time, requests, asyncio, traceback
 from fastapi import FastAPI, Response, Header
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -105,5 +105,5 @@ async def image(authorization: str = Header(None), url: str = Header(None)):
             f.write(str(int(time.time())) + ' ' + f'{url} | {elapsed}ms')
         return Response({"redirects": redirect_list, "elapsed": elapsed}, status_code=200)
     except Exception as e:
-        print(e)
+        traceback.print_exc()
         return Response(f'Error: {e}', status_code=500)
