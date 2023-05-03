@@ -1,4 +1,4 @@
-import os, time, requests, asyncio
+import os, time, requests, asyncio, traceback
 from fastapi import FastAPI, Response, Header
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -100,10 +100,10 @@ async def image(authorization: str = Header(None), url: str = Header(None)):
             return Response('Missing URL in header', status_code=400)
         print("Working on URL:", url)
         loop = asyncio.get_running_loop()
-        redirect_list, elapsed = await loop.run_in_executor(None, de_shorten_url, url)
+        redirect_list, elapsed = await de_shorten_url(url)
         with open('log.txt', 'a+') as f:
             f.write(str(int(time.time())) + ' ' + f'{url} | {elapsed}ms')
-        return Response({"redirects": redirect_list, "elapsed": elapsed}, status_code=200)
+        return {"redirects": redirect_list, "elapsed": elapsed}
     except Exception as e:
-        print(e)
+        traceback.print_exc()
         return Response(f'Error: {e}', status_code=500)
