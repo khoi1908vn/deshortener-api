@@ -103,7 +103,7 @@ async def image(authorization: str = Header(None), url: str = Header(None)):
         redirect_list, elapsed = await de_shorten_url(url)
         with open('log.txt', 'a+') as f:
             f.write(str(int(time.time())) + ' ' + f'{url} | {elapsed}ms')
-        return Response({"redirects": redirect_list, "elapsed": elapsed}, status_code=200)
+        return {"redirects": redirect_list, "elapsed": elapsed}
     except Exception as e:
         traceback.print_exc()
         return Response(f'Error: {e}', status_code=500)
