@@ -100,7 +100,7 @@ async def image(authorization: str = Header(None), url: str = Header(None)):
             return Response('Missing URL in header', status_code=400)
         print("Working on URL:", url)
         loop = asyncio.get_running_loop()
-        redirect_list, elapsed = await loop.run_in_executor(None, de_shorten_url, url)
+        redirect_list, elapsed = await de_shorten_url(url)
         with open('log.txt', 'a+') as f:
             f.write(str(int(time.time())) + ' ' + f'{url} | {elapsed}ms')
         return Response({"redirects": redirect_list, "elapsed": elapsed}, status_code=200)
