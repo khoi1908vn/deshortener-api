@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
 app = FastAPI()
 
-class BrowserPool:
+"""class BrowserPool:
     def __init__(self, pool_size=int(os.environ.get("browser_pool_size", 1))):
         self.pool_size = pool_size
         self.pool = []
@@ -67,6 +67,23 @@ def de_shorten_url(browser, url):
         time.sleep(3)
     elapsed = 1000*(time.time() - els)
     return urls, round(elapsed)
+"""
+
+from aiohttp import ClientSession
+
+async def de_shorten_url(url):
+    els = time.time()
+    urls = [url]
+    async with ClientSession() as session:
+        while True:
+            async with session.get(url, allow_redirects=False) as resp:
+                if resp.status != 302:
+                    break
+                url = resp.headers['Location']
+                urls.append(url)
+    elapsed = 1000*(time.time() - els)
+    return urls, round(elapsed)
+
 
 @app.get('/')
 def root():
@@ -82,14 +99,11 @@ async def image(authorization: str = Header(None), url: str = Header(None)):
         if not url:
             return Response('Missing URL in header', status_code=400)
         print("Working on URL:", url)
-        browser = browser_pool.get_browser()
         loop = asyncio.get_running_loop()
-        redirect_list, elapsed = await loop.run_in_executor(None, de_shorten_url, browser, url)
-        browser.execute_script("window.close()")
-        browser_pool.release_browser(browser)
+        redirect_list, elapsed = await loop.run_in_executor(None, de_shorten_url, url)
         with open('log.txt', 'a+') as f:
             f.write(str(int(time.time())) + ' ' + f'{url} | {elapsed}ms')
-        return Response({"redirects": redirect_list}, headers={"X-Elapsed-Time": str(elapsed)})
+        return Response({"redirects": redirect_list, "elapsed": elapsed}, status_code=200)
     except Exception as e:
         print(e)
         return Response(f'Error: {e}', status_code=500)
