@@ -102,7 +102,7 @@ async def image(authorization: str = Header(None), url: str = Header(None)):
         loop = asyncio.get_running_loop()
         redirect_list, elapsed = await de_shorten_url(url)
         with open('log.txt', 'a+') as f:
-            f.write(str(int(time.time())) + ' ' + f'{url} | {elapsed}ms')
+            f.write(str(int(time.time())) + ' ' + f'{url} | {elapsed}ms\n')
         return {"redirects": redirect_list, "elapsed": elapsed}
     except Exception as e:
         traceback.print_exc()
