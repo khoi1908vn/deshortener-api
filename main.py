@@ -77,7 +77,7 @@ async def de_shorten_url(url):
     async with ClientSession() as session:
         while True:
             async with session.get(url, allow_redirects=False) as resp:
-                if resp.status != 302:
+                if resp.status not in [301, 302, 303, 307, 308]:
                     break
                 url = resp.headers['Location']
                 urls.append(url)
