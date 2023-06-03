@@ -82,7 +82,7 @@ async def de_shorten_url(url):
                 url = resp.headers['Location']
                 urls.append(url)
     elapsed = 1000*(time.time() - els)
-    return urls, round(elapsed)
+    return list(set(urls)), round(elapsed)
 
 
 @app.get('/')
